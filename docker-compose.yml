@@ -1,0 +1,43 @@
+services:
+  profile_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    depends_on:
+      - profile_db  # Changed from db to profile_db
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    environment:
+      - AUTH_SERVICE_URL=http://auth_api:5000
+    restart: unless-stopped
+    networks:
+      - app_network
+    # Add healthcheck to wait for the database
+    command: >
+      sh -c "
+        echo 'Waiting for database to be ready...' &&
+        until PGPASSWORD=postgres pg_isready -h profile_db -p 5432 -U postgres; do
+          echo 'Database not ready yet - waiting...' &&
+          sleep 2;
+        done &&
+        echo 'Database ready, starting app...' &&
+        gunicorn --bind 0.0.0.0:5001 "run:app"
+      "
+
+  profile_db:  # Changed from db to profile_db
+    image: postgres:15
+    ports:
+      - "5433:5432"  # Map to different host port to avoid conflicts
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-profile_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - app_network

@@ -1,0 +1,50 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.python-version
+Python cache files
+pycache/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# IDE configurations
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+#Log files
+*.log
+logs/
+
+#Temporary files
+tmp/
+temp/
+.DS_Store
+*.swp
+
+#Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+#Docker volumes
+postgres_data/
