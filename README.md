@@ -50,3 +50,65 @@ This service integrates with the Authentication Service for user validation and 
 Copy the sample environment file:
 ```bash
 cp .env.example .env
+
+# API Documentation Guide
+
+The User Profile Service includes comprehensive API documentation using Swagger/OpenAPI. This documentation makes it easy for frontend developers and API users to understand the available endpoints, expected request formats, and response structures.
+
+## Accessing the API Documentation
+
+Once the service is running, you can access the Swagger UI at:
+
+```
+http://localhost:5001/api/docs
+```
+
+This will present you with an interactive API documentation interface.
+
+## Features of the Swagger UI
+
+1. **Interactive Documentation**: Test API endpoints directly from the browser
+2. **Authentication Support**: Easily add your JWT token for authenticated requests
+3. **Request/Response Models**: Clear documentation of all data models
+4. **Error Handling**: Documentation of possible error responses
+5. **Parameter Documentation**: Detailed information about each parameter
+
+## Authentication
+
+Most endpoints require authentication. To use the interactive features of the Swagger UI:
+
+1. Click the "Authorize" button at the top of the page
+2. Enter your JWT token in the format: `Bearer your_token_here`
+3. Click "Authorize" and close the dialog
+
+## Example Operations
+
+The API documentation provides complete details for all endpoints, including:
+
+### Profile Management
+- Get your profile
+- Update profile details
+- Search for profiles
+
+### Expertise Management
+- Add expertise areas
+- Update expertise details
+- Delete expertise areas
+
+### Preference Management
+- Get all preferences
+- Set individual preferences
+- Delete preferences
+
+### Connection Management
+- Request connections with other users
+- Accept or reject connection requests
+- View your connections
+
+## Development
+
+If you make changes to the API, the documentation will automatically update to reflect these changes. The documentation is generated from the code annotations in the `app/api/restx` directory and the model definitions in `app/api/docs.py`.
+
+## API Versioning
+
+The current API version is 1.0. Future versions will be documented accordingly, ensuring backward compatibility or providing clear migration paths.

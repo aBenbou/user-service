@@ -67,6 +67,11 @@ def register_blueprints(app):
     Args:
         app: Flask application
     """
+    # Register main blueprint for index page
+    from app.routes import main_bp
+    app.register_blueprint(main_bp)
+    
+    # Register standard API endpoints
     from app.api.profiles import profiles_bp
     from app.api.expertise import expertise_bp
     from app.api.preferences import preferences_bp
@@ -76,6 +81,13 @@ def register_blueprints(app):
     app.register_blueprint(expertise_bp, url_prefix='/api')  # Routes include /profiles prefix
     app.register_blueprint(preferences_bp, url_prefix='/api')  # Routes include /profiles prefix
     app.register_blueprint(connections_bp, url_prefix='/api')  # Routes include /profiles prefix
+    
+    # Register Swagger documentation endpoint
+    from app.api.docs import docs_bp
+    app.register_blueprint(docs_bp, url_prefix='/api')
+    
+    # Import RESTX endpoints to register with Swagger
+    import app.api.restx
 
 def configure_logging(app):
     """Configure logging for the application
