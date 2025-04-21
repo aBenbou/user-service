@@ -16,6 +16,7 @@ services:
     restart: unless-stopped
     networks:
       - app_network
+      - microservices-network
     # Add healthcheck to wait for the database
     command: >
       sh -c "
@@ -41,10 +42,13 @@ services:
     restart: unless-stopped
     networks:
       - app_network
+      - microservices-network
 
 networks:
   app_network:
     driver: bridge
+  microservices-network:
+    external: true
 
 volumes:
   postgres_data:
