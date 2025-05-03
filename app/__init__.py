@@ -5,11 +5,16 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from logging.handlers import RotatingFileHandler
+from app.utils.decorators import limiter
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from app.config import config
 
 # Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
+limiter = Limiter(key_func=get_remote_address)
 
 def create_app(config_name=None):
     """Create and configure the Flask application
@@ -25,13 +30,13 @@ def create_app(config_name=None):
     # Load configuration
     if config_name is None:
         config_name = os.getenv('FLASK_ENV', 'default')
-    from app.config import config
     app.config.from_object(config[config_name])
     
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+    limiter.init_app(app)
 
     @jwt.user_identity_loader
     def user_identity_lookup(user):
@@ -49,6 +54,10 @@ def create_app(config_name=None):
     
     # Register blueprints
     register_blueprints(app)
+    
+    # Register commands
+    from app.commands import init_badges
+    app.cli.add_command(init_badges)
     
     # Create database tables if they don't exist
     try:
@@ -76,11 +85,13 @@ def register_blueprints(app):
     from app.api.expertise import expertise_bp
     from app.api.preferences import preferences_bp
     from app.api.connections import connections_bp
+    from app.api.gamification import gamification_bp
     
     app.register_blueprint(profiles_bp, url_prefix='/api/profiles')
     app.register_blueprint(expertise_bp, url_prefix='/api')  # Routes include /profiles prefix
     app.register_blueprint(preferences_bp, url_prefix='/api')  # Routes include /profiles prefix
     app.register_blueprint(connections_bp, url_prefix='/api')  # Routes include /profiles prefix
+    app.register_blueprint(gamification_bp)  # URL prefix is already set in the blueprint
     
     # Register Swagger documentation endpoint
     from app.api.docs import docs_bp

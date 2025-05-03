@@ -1,7 +1,7 @@
 from datetime import datetime
 from app import db
 from app.models.user import User
-from app.models.gamification import Points, Level, Badge, UserBadge
+from app.models.gamification import Points, Badge, UserBadge
 
 class GamificationService:
     def __init__(self):

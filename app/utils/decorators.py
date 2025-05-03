@@ -2,6 +2,29 @@ from functools import wraps
 from flask import request, jsonify, g, current_app
 from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
 from uuid import UUID
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+# Initialize rate limiter
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
+
+def rate_limit(f):
+    """Rate limiting decorator"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            if "rate limit exceeded" in str(e).lower():
+                return jsonify({
+                    'error': 'Rate limit exceeded',
+                    'message': 'Too many requests. Please try again later.'
+                }), 429
+            raise
+    return decorated_function
 
 def jwt_required_with_permissions(permissions=None):
     """Decorator to check JWT and verify required permissions"""
