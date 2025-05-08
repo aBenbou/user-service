@@ -9,6 +9,7 @@ from app.utils.decorators import limiter
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from app.config import config
+from app.log_config import configure_logging
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -26,7 +27,7 @@ def create_app(config_name=None):
         Configured Flask application
     """
     app = Flask(__name__)
-    
+    configure_logging(app)
     # Load configuration
     if config_name is None:
         config_name = os.getenv('FLASK_ENV', 'default')
