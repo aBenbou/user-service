@@ -1,19 +1,20 @@
 from datetime import datetime
 from app import db
+import uuid
 
 class Points(db.Model):
     __tablename__ = 'points'
     
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
     reason = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     def to_dict(self):
         return {
-            'id': self.id,
-            'user_id': self.user_id,
+            'id': str(self.id),
+            'user_id': str(self.user_id),
             'amount': self.amount,
             'reason': self.reason,
             'created_at': self.created_at.isoformat() if self.created_at else None
@@ -22,7 +23,7 @@ class Points(db.Model):
 class Badge(db.Model):
     __tablename__ = 'badges'
     
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     type = db.Column(db.String(50), nullable=False)  # level, achievement, etc.
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
@@ -71,7 +72,7 @@ class Badge(db.Model):
     
     def to_dict(self):
         return {
-            'id': self.id,
+            'id': str(self.id),
             'type': self.type,
             'name': self.name,
             'description': self.description,
@@ -83,9 +84,9 @@ class Badge(db.Model):
 class UserBadge(db.Model):
     __tablename__ = 'user_badges'
     
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    badge_id = db.Column(db.Integer, db.ForeignKey('badges.id'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    badge_id = db.Column(db.String(36), db.ForeignKey('badges.id'), nullable=False)
     awarded_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Unique constraint to prevent duplicate badges
@@ -93,9 +94,9 @@ class UserBadge(db.Model):
     
     def to_dict(self):
         return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'badge_id': self.badge_id,
+            'id': str(self.id),
+            'user_id': str(self.user_id),
+            'badge_id': str(self.badge_id),
             'awarded_at': self.awarded_at.isoformat() if self.awarded_at else None,
             'badge': self.badge.to_dict() if self.badge else None
         } 

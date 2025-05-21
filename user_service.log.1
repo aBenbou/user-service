@@ -1,0 +1,145 @@
+[2025-05-21 09:49:23,926] [Request ID: no-request-id] ERROR - Unhandled error in delete_preference_route (preferences.py:108)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.InvalidTextRepresentation: invalid input value for enum preference_category: "VISIBILITY"
+LINE 3: ...ed5-d441fabdb369' AND user_preferences.category = 'VISIBILIT...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/app/api/preferences.py", line 100, in delete_preference_route
+    result = delete_preference(profile_uuid, category.upper(), key)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/preference_service.py", line 115, in delete_preference
+    ).first()
+      ^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2748, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2847, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2308, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2190, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 293, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2343, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.DataError: (psycopg2.errors.InvalidTextRepresentation) invalid input value for enum preference_category: "VISIBILITY"
+LINE 3: ...ed5-d441fabdb369' AND user_preferences.category = 'VISIBILIT...
+                                                             ^
+
+[SQL: SELECT user_preferences.id AS user_preferences_id, user_preferences.user_id AS user_preferences_user_id, user_preferences.category AS user_preferences_category, user_preferences.key AS user_preferences_key, user_preferences.value AS user_preferences_value 
+FROM user_preferences 
+WHERE user_preferences.user_id = %(user_id_1)s AND user_preferences.category = %(category_1)s AND user_preferences.key = %(key_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'user_id_1': '1cbd8c45-5566-4b1c-aed5-d441fabdb369', 'category_1': 'VISIBILITY', 'key_1': '40d391be-901a-4b3d-acf4-644abf24f0d0', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/9h9h)
+[2025-05-21 09:49:55,271] [Request ID: no-request-id] ERROR - Unhandled error in delete_preference_route (preferences.py:108)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.InvalidTextRepresentation: invalid input value for enum preference_category: "VISIBILITY"
+LINE 3: ...ed5-d441fabdb369' AND user_preferences.category = 'VISIBILIT...
+                                                             ^
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/app/api/preferences.py", line 100, in delete_preference_route
+    result = delete_preference(profile_uuid, category.upper(), key)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/preference_service.py", line 115, in delete_preference
+    ).first()
+      ^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2748, in first
+    return self.limit(1)._iter().first()  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2847, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2308, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2190, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py", line 293, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2343, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.DataError: (psycopg2.errors.InvalidTextRepresentation) invalid input value for enum preference_category: "VISIBILITY"
+LINE 3: ...ed5-d441fabdb369' AND user_preferences.category = 'VISIBILIT...
+                                                             ^
+
+[SQL: SELECT user_preferences.id AS user_preferences_id, user_preferences.user_id AS user_preferences_user_id, user_preferences.category AS user_preferences_category, user_preferences.key AS user_preferences_key, user_preferences.value AS user_preferences_value 
+FROM user_preferences 
+WHERE user_preferences.user_id = %(user_id_1)s AND user_preferences.category = %(category_1)s AND user_preferences.key = %(key_1)s 
+ LIMIT %(param_1)s]
+[parameters: {'user_id_1': '1cbd8c45-5566-4b1c-aed5-d441fabdb369', 'category_1': 'VISIBILITY', 'key_1': '40d391be-901a-4b3d-acf4-644abf24f0d0', 'param_1': 1}]
+(Background on this error at: https://sqlalche.me/e/20/9h9h)
+[2025-05-21 09:56:24,540] [Request ID: no-request-id] INFO - Create connection endpoint called (connections.py:44)
+[2025-05-21 09:56:24,559] [Request ID: no-request-id] INFO - Connection created successfully (connections.py:52)
+[2025-05-21 09:57:49,219] [Request ID: no-request-id] INFO - Get connections endpoint called (connections.py:18)
+[2025-05-21 09:57:49,223] [Request ID: no-request-id] ERROR - Unhandled error in get_connections_route (connections.py:37)
+Traceback (most recent call last):
+  File "/app/app/api/connections.py", line 26, in get_connections_route
+    result = get_connections(profile_uuid, status, direction)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/connection_service.py", line 35, in get_connections
+    outgoing = outgoing.filter_by(status=status)
+               ^^^^^^^^^^^^^^^^^^
+AttributeError: 'InstrumentedList' object has no attribute 'filter_by'
+[2025-05-21 10:02:09,468] [Request ID: N/A] INFO - Database tables created successfully (__init__.py:62)
+[2025-05-21 10:02:20,235] [Request ID: no-request-id] INFO - Get connections endpoint called (connections.py:18)
+[2025-05-21 10:02:20,258] [Request ID: no-request-id] INFO - Connections retrieved successfully (connections.py:29)

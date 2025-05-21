@@ -1,6 +1,28 @@
 import os
 from datetime import timedelta
 
+# ---------------------------------------------------------------------------
+# Helper utilities
+# ---------------------------------------------------------------------------
+
+def _get_int_env(var_name: str, default: int) -> int:
+    """Return an int from env or fall back to *default*.
+
+    The helper is defensive: it allows comments or extra whitespace in the
+    variable (e.g. "3600  # 1 hour") and silently falls back to *default* if
+    conversion fails.
+    """
+    raw = os.getenv(var_name)
+    if raw is None:
+        return default
+
+    # Take only the first numeric token to ignore inline comments.
+    token = raw.strip().split()[0]
+    try:
+        return int(token)
+    except (TypeError, ValueError):
+        return default
+
 class Config:
     """Base configuration."""
     
@@ -14,8 +36,8 @@ class Config:
     
     # Redis
     REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-    REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
-    REDIS_DB = int(os.getenv('REDIS_DB', 0))
+    REDIS_PORT = _get_int_env('REDIS_PORT', 6379)
+    REDIS_DB = _get_int_env('REDIS_DB', 0)
     REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', None)
     
     # Rate limiting
@@ -25,8 +47,8 @@ class Config:
     
     # JWT
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-dev-key-change-in-production')
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=int(os.getenv('JWT_ACCESS_TOKEN_EXPIRES', 3600)))
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(seconds=int(os.getenv('JWT_REFRESH_TOKEN_EXPIRES', 2592000)))
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=_get_int_env('JWT_ACCESS_TOKEN_EXPIRES', 3600))
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(seconds=_get_int_env('JWT_REFRESH_TOKEN_EXPIRES', 2592000))
     JWT_TOKEN_LOCATION = ['headers']
     
     # Auth Service

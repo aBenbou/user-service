@@ -73,3 +73,41 @@ def is_owner_or_admin(user_id: UUID, profile_id: UUID) -> bool:
     
     # User is an admin
     return is_admin(user_id)
+
+# ---------------------------------------------------------------------------
+# User metadata helper – used by the gamification module to lazily create
+# a local User row when it does not yet exist.
+# ---------------------------------------------------------------------------
+
+def get_user_basic(user_id: UUID) -> Dict[str, Any]:
+    """Return basic user record (email & username) from the Auth Service.
+
+    If the Auth Service responds with 200, the payload is returned.  Any
+    non-200 response or exception returns  {"success": False} so callers can
+    decide what to do.
+    """
+    try:
+        auth_service_url = current_app.config['AUTH_SERVICE_URL']
+        app_token = current_app.config['AUTH_SERVICE_TOKEN']
+
+        resp = requests.get(
+            f"{auth_service_url}/api/users/{user_id}",
+            headers={"Authorization": f"Bearer {app_token}"},
+            timeout=5,
+        )
+
+        if resp.status_code == 200:
+            data = resp.json()
+            return {
+                "success": True,
+                "email": data.get("email"),
+                "username": data.get("username"),
+            }
+
+        current_app.logger.warning(
+            "Auth Service returned %s for /users/%s", resp.status_code, user_id
+        )
+        return {"success": False}
+    except Exception as exc:
+        current_app.logger.error("get_user_basic error: %s", exc)
+        return {"success": False}

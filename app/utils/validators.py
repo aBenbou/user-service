@@ -1,6 +1,20 @@
 from typing import Dict, Any
 import re
 
+# Re-export Pydantic schema objects so callers can import them from a single
+# location:
+#   from app.utils.validators import UserProfileBase, UserProfileCreate, ...
+# This keeps compatibility while we migrate away from scattered validator
+# modules.
+
+from app.models.validators import (  # noqa: F401
+    UserProfileBase,
+    UserProfileCreate,
+    UserProfileUpdate,
+    UserProfileResponse,
+    UserProfileList,
+)
+
 def validate_profile_data(data: Dict[str, Any], update: bool = False) -> Dict[str, Any]:
     """Validate profile data
     

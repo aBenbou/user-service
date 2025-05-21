@@ -19,7 +19,7 @@ def get_connections(
     Returns:
         Dictionary with connections
     """
-    profile = UserProfile.query.get(profile_id)
+    profile = db.session.get(UserProfile, str(profile_id))
     if not profile or not profile.is_active():
         return {
             'success': False,
@@ -30,17 +30,17 @@ def get_connections(
     
     # Get outgoing connections
     if direction in ['all', 'outgoing']:
-        outgoing = profile.outgoing_connections
+        outgoing = profile.outgoing_connections  # InstrumentedList
         if status:
-            outgoing = outgoing.filter_by(status=status)
-        connections.extend(outgoing.all())
+            outgoing = [c for c in outgoing if c.status == status]
+        connections.extend(outgoing)
     
     # Get incoming connections
     if direction in ['all', 'incoming']:
         incoming = profile.incoming_connections
         if status:
-            incoming = incoming.filter_by(status=status)
-        connections.extend(incoming.all())
+            incoming = [c for c in incoming if c.status == status]
+        connections.extend(incoming)
     
     return {
         'success': True,
@@ -58,8 +58,8 @@ def request_connection(requester_id: UUID, recipient_id: UUID) -> Dict[str, Any]
         Dictionary with success status and connection data
     """
     # Check if both users exist and are active
-    requester = UserProfile.query.get(requester_id)
-    recipient = UserProfile.query.get(recipient_id)
+    requester = db.session.get(UserProfile, str(requester_id))
+    recipient = db.session.get(UserProfile, str(recipient_id))
     
     if not requester or not requester.is_active():
         return {
@@ -82,13 +82,13 @@ def request_connection(requester_id: UUID, recipient_id: UUID) -> Dict[str, Any]
     
     # Check for existing connection in either direction
     existing_outgoing = UserConnection.query.filter_by(
-        requester_id=requester_id,
-        recipient_id=recipient_id
+        requester_id=str(requester_id),
+        recipient_id=str(recipient_id)
     ).first()
     
     existing_incoming = UserConnection.query.filter_by(
-        requester_id=recipient_id,
-        recipient_id=requester_id
+        requester_id=str(recipient_id),
+        recipient_id=str(requester_id)
     ).first()
     
     if existing_outgoing:
@@ -105,8 +105,8 @@ def request_connection(requester_id: UUID, recipient_id: UUID) -> Dict[str, Any]
     
     # Create new connection request
     connection = UserConnection(
-        requester_id=requester_id,
-        recipient_id=recipient_id,
+        requester_id=str(requester_id),
+        recipient_id=str(recipient_id),
         status='PENDING'
     )
     
@@ -142,15 +142,15 @@ def update_connection_status(
         }
     
     # Get the connection
-    connection = UserConnection.query.get(connection_id)
+    connection = db.session.get(UserConnection, str(connection_id))
     if not connection:
         return {
             'success': False,
             'message': 'Connection not found'
         }
     
-    # Only the recipient can accept/reject connections
-    if connection.recipient_id != profile_id:
+    # Ensure the caller is the recipient
+    if str(connection.recipient_id).strip() != str(profile_id):
         return {
             'success': False,
             'message': 'Only the recipient can update the connection status'
@@ -184,7 +184,7 @@ def delete_connection(profile_id: UUID, connection_id: UUID) -> Dict[str, Any]:
         Dictionary with success status
     """
     # Get the connection
-    connection = UserConnection.query.get(connection_id)
+    connection = db.session.get(UserConnection, str(connection_id))
     if not connection:
         return {
             'success': False,
@@ -192,7 +192,10 @@ def delete_connection(profile_id: UUID, connection_id: UUID) -> Dict[str, Any]:
         }
     
     # Verify the user is part of this connection
-    if connection.requester_id != profile_id and connection.recipient_id != profile_id:
+    if (
+        str(connection.requester_id).strip() != str(profile_id).strip()
+        and str(connection.recipient_id).strip() != str(profile_id).strip()
+    ):
         return {
             'success': False,
             'message': 'You are not authorized to delete this connection'

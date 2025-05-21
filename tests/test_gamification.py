@@ -144,7 +144,7 @@ def test_duplicate_badge_award(client, auth_headers, test_user, db_session):
                           headers=auth_headers,
                           json={'type': 'level', 'requirement': '1'})
     assert response.status_code == 400
-    assert 'already has this badge' in response.get_json()['error']
+    assert 'already has this badge' in response.get_json()['message']
 
 def test_invalid_points(client, auth_headers):
     """Test adding points with invalid data"""
@@ -159,4 +159,4 @@ def test_invalid_badge_award(client, auth_headers):
                           headers=auth_headers,
                           json={'type': 'invalid', 'requirement': '999'})
     assert response.status_code == 400
-    assert 'Badge not found' in response.get_json()['error'] 
+    assert 'Badge not found' in response.get_json()['message'] 
