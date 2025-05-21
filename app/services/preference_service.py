@@ -3,6 +3,7 @@ from uuid import UUID
 from app import db
 from app.models.preference import UserPreference
 from app.models.profile import UserProfile
+from app.enums import PreferenceCategory
 
 def get_preferences(profile_id: UUID, category: Optional[str] = None) -> Dict[str, Any]:
     """Get user preferences, optionally filtered by category
@@ -14,7 +15,7 @@ def get_preferences(profile_id: UUID, category: Optional[str] = None) -> Dict[st
     Returns:
         Dictionary with preferences
     """
-    profile = UserProfile.query.get(profile_id)
+    profile = db.session.get(UserProfile, str(profile_id))
     if not profile or not profile.is_active():
         return {
             'success': False,
@@ -22,7 +23,7 @@ def get_preferences(profile_id: UUID, category: Optional[str] = None) -> Dict[st
         }
     
     # Filter query by category if provided
-    query = UserPreference.query.filter_by(user_id=profile_id)
+    query = UserPreference.query.filter_by(user_id=str(profile_id))
     if category:
         query = query.filter_by(category=category)
     
@@ -45,15 +46,15 @@ def set_preference(profile_id: UUID, category: str, key: str, value: Any) -> Dic
     Returns:
         Dictionary with success status and preference data
     """
-    profile = UserProfile.query.get(profile_id)
+    profile = db.session.get(UserProfile, str(profile_id))
     if not profile or not profile.is_active():
         return {
             'success': False,
             'message': 'Profile not found'
         }
     
-    # Validate category
-    valid_categories = ['NOTIFICATIONS', 'PRIVACY', 'APPEARANCE']
+    # Validate category using enum values
+    valid_categories = [c.value for c in PreferenceCategory]
     if category not in valid_categories:
         return {
             'success': False,
@@ -62,7 +63,7 @@ def set_preference(profile_id: UUID, category: str, key: str, value: Any) -> Dic
     
     # Check if preference already exists
     preference = UserPreference.query.filter_by(
-        user_id=profile_id,
+        user_id=str(profile_id),
         category=category,
         key=key
     ).first()
@@ -73,7 +74,7 @@ def set_preference(profile_id: UUID, category: str, key: str, value: Any) -> Dic
     else:
         # Create new preference
         preference = UserPreference(
-            user_id=profile_id,
+            user_id=str(profile_id),
             category=category,
             key=key,
             value=value
@@ -99,7 +100,7 @@ def delete_preference(profile_id: UUID, category: str, key: str) -> Dict[str, An
     Returns:
         Dictionary with success status
     """
-    profile = UserProfile.query.get(profile_id)
+    profile = db.session.get(UserProfile, str(profile_id))
     if not profile or not profile.is_active():
         return {
             'success': False,
@@ -108,7 +109,7 @@ def delete_preference(profile_id: UUID, category: str, key: str) -> Dict[str, An
     
     # Find the preference
     preference = UserPreference.query.filter_by(
-        user_id=profile_id,
+        user_id=str(profile_id),
         category=category,
         key=key
     ).first()
