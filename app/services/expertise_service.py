@@ -13,14 +13,14 @@ def get_expertise_areas(profile_id: UUID) -> Dict[str, Any]:
     Returns:
         Dictionary with expertise areas
     """
-    profile = UserProfile.query.get(profile_id)
+    profile = db.session.get(UserProfile, str(profile_id))
     if not profile or not profile.is_active():
         return {
             'success': False,
             'message': 'Profile not found'
         }
     
-    expertise_areas = ExpertiseArea.query.filter_by(user_id=profile_id).all()
+    expertise_areas = ExpertiseArea.query.filter_by(user_id=str(profile_id)).all()
     
     return {
         'success': True,
@@ -37,7 +37,7 @@ def add_expertise_area(profile_id: UUID, data: Dict[str, Any]) -> Dict[str, Any]
     Returns:
         Dictionary with success status and expertise area data
     """
-    profile = UserProfile.query.get(profile_id)
+    profile = db.session.get(UserProfile, str(profile_id))
     if not profile or not profile.is_active():
         return {
             'success': False,
@@ -53,7 +53,7 @@ def add_expertise_area(profile_id: UUID, data: Dict[str, Any]) -> Dict[str, Any]
     
     # Check if domain already exists for this user
     existing = ExpertiseArea.query.filter_by(
-        user_id=profile_id, 
+        user_id=str(profile_id), 
         domain=data['domain']
     ).first()
     
@@ -65,7 +65,7 @@ def add_expertise_area(profile_id: UUID, data: Dict[str, Any]) -> Dict[str, Any]
     
     # Create new expertise area
     expertise = ExpertiseArea(
-        user_id=profile_id,
+        user_id=str(profile_id),
         domain=data['domain'],
         level=data['level'],
         years_experience=data.get('years_experience')
@@ -92,16 +92,20 @@ def update_expertise_area(profile_id: UUID, expertise_id: UUID, data: Dict[str, 
         Dictionary with success status and updated expertise area data
     """
     # Verify the profile exists and is active
-    profile = UserProfile.query.get(profile_id)
+    profile = db.session.get(UserProfile, str(profile_id))
     if not profile or not profile.is_active():
         return {
             'success': False,
             'message': 'Profile not found'
         }
     
-    # Get the expertise area
-    expertise = ExpertiseArea.query.get(expertise_id)
-    if not expertise or expertise.user_id != profile_id:
+    # Get the expertise area – use explicit query to avoid PK-type mismatch issues
+    expertise = (
+        db.session.query(ExpertiseArea)
+        .filter_by(id=str(expertise_id), user_id=str(profile_id))
+        .first()
+    )
+    if not expertise:
         return {
             'success': False,
             'message': 'Expertise area not found for this user'
@@ -134,16 +138,20 @@ def delete_expertise_area(profile_id: UUID, expertise_id: UUID) -> Dict[str, Any
         Dictionary with success status
     """
     # Verify the profile exists and is active
-    profile = UserProfile.query.get(profile_id)
+    profile = db.session.get(UserProfile, str(profile_id))
     if not profile or not profile.is_active():
         return {
             'success': False,
             'message': 'Profile not found'
         }
     
-    # Get the expertise area
-    expertise = ExpertiseArea.query.get(expertise_id)
-    if not expertise or expertise.user_id != profile_id:
+    # Get the expertise area – same logic as in update
+    expertise = (
+        db.session.query(ExpertiseArea)
+        .filter_by(id=str(expertise_id), user_id=str(profile_id))
+        .first()
+    )
+    if not expertise:
         return {
             'success': False,
             'message': 'Expertise area not found for this user'

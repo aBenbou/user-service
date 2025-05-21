@@ -15,7 +15,7 @@ def get_profile_by_id(profile_id: UUID, include_private: bool = False) -> Option
     Returns:
         Dictionary representation of the profile or None if not found
     """
-    profile = UserProfile.query.get(profile_id)
+    profile = db.session.get(UserProfile, str(profile_id))
     if not profile or not profile.is_active():
         return None
     
@@ -30,7 +30,7 @@ def get_my_profile(user_id: UUID) -> Optional[Dict[str, Any]]:
     Returns:
         Dictionary representation of the profile or None if not found
     """
-    profile = UserProfile.query.get(user_id)
+    profile = db.session.get(UserProfile, str(user_id))
     if not profile:
         return None
     
@@ -48,7 +48,7 @@ def create_profile(user_id: UUID, data: Dict[str, Any]) -> Dict[str, Any]:
         Dictionary with success status and profile data
     """
     # Check if profile already exists
-    existing_profile = UserProfile.query.get(user_id)
+    existing_profile = db.session.get(UserProfile, str(user_id))
     if existing_profile:
         return {
             'success': False,
@@ -65,7 +65,7 @@ def create_profile(user_id: UUID, data: Dict[str, Any]) -> Dict[str, Any]:
     
     # Create new profile
     profile = UserProfile(
-        id=user_id,
+        id=str(user_id),
         first_name=data.get('first_name'),
         last_name=data.get('last_name'),
         username=data.get('username'),
@@ -97,7 +97,7 @@ def update_profile(profile_id: UUID, data: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         Dictionary with success status and updated profile data
     """
-    profile = UserProfile.query.get(profile_id)
+    profile = db.session.get(UserProfile, str(profile_id))
     if not profile or not profile.is_active():
         return {
             'success': False,
@@ -138,7 +138,7 @@ def deactivate_profile(profile_id: UUID) -> Dict[str, Any]:
     Returns:
         Dictionary with success status
     """
-    profile = UserProfile.query.get(profile_id)
+    profile = db.session.get(UserProfile, str(profile_id))
     if not profile or not profile.is_active():
         return {
             'success': False,

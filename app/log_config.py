@@ -22,6 +22,15 @@ def configure_logging(app):
     formatter = RequestFormatter(
         '[%(asctime)s] [Request ID: %(request_id)s] %(levelname)s - %(message)s (%(filename)s:%(lineno)d)'
     )
+
+    # In testing mode we avoid external dependencies and file locks.
+    if app.testing:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
+        logger.addHandler(stream_handler)
+        app.logger = logger
+        return logger
+
     environment = app.config.get('ENVIRONMENT', 'local')
 
     log_group = "user-service-log-group"

@@ -1,13 +1,12 @@
 from datetime import datetime
 import uuid
-from sqlalchemy.dialects.postgresql import UUID
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model):
     __tablename__ = 'users'
     
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
@@ -30,7 +29,7 @@ class User(db.Model):
     
     def to_dict(self):
         return {
-            'id': self.id,
+            'id': str(self.id),
             'email': self.email,
             'username': self.username,
             'created_at': self.created_at.isoformat(),

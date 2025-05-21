@@ -13,6 +13,7 @@ services:
       - ./:/app
     environment:
       - AUTH_SERVICE_URL=http://auth_api:5000
+      - DATABASE_URI=postgresql://postgres:postgres@profile_db:5432/profile_db
     restart: unless-stopped
     networks:
       - app_network
@@ -25,7 +26,9 @@ services:
           echo 'Database not ready yet - waiting...' &&
           sleep 2;
         done &&
-        echo 'Database ready, starting app...' &&
+        echo 'Database ready, running migrations...' &&
+        python migrate.py up &&
+        echo 'Migrations finished, starting app...' &&
         gunicorn --bind 0.0.0.0:5001 "run:app"
       "
 

@@ -4,10 +4,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
-from logging.handlers import RotatingFileHandler
 from app.utils.decorators import limiter
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from app.config import config
 from app.log_config import configure_logging
 
@@ -15,7 +12,6 @@ from app.log_config import configure_logging
 db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
-limiter = Limiter(key_func=get_remote_address)
 
 def create_app(config_name=None):
     """Create and configure the Flask application
@@ -27,7 +23,6 @@ def create_app(config_name=None):
         Configured Flask application
     """
     app = Flask(__name__)
-    configure_logging(app)
     # Load configuration
     if config_name is None:
         config_name = os.getenv('FLASK_ENV', 'default')
@@ -39,6 +34,9 @@ def create_app(config_name=None):
     jwt.init_app(app)
     limiter.init_app(app)
 
+    # Configure logging using shared log_config implementation
+    configure_logging(app)
+
     @jwt.user_identity_loader
     def user_identity_lookup(user):
         """Ensure the identity is always a string (UUID is converted to string)"""
@@ -49,9 +47,6 @@ def create_app(config_name=None):
         """We don't need to load user from database since Auth Service handles validation"""
         identity = jwt_data["sub"]
         return identity
-    
-    # Configure logging
-    configure_logging(app)
     
     # Register blueprints
     register_blueprints(app)
@@ -93,41 +88,3 @@ def register_blueprints(app):
     app.register_blueprint(preferences_bp, url_prefix='/api')  # Routes include /profiles prefix
     app.register_blueprint(connections_bp, url_prefix='/api')  # Routes include /profiles prefix
     app.register_blueprint(gamification_bp)  # URL prefix is already set in the blueprint
-    
-    # Register Swagger documentation endpoint
-    from app.api.docs import docs_bp
-    app.register_blueprint(docs_bp, url_prefix='/api')
-    
-    # Import RESTX endpoints to register with Swagger
-    import app.api.restx
-
-def configure_logging(app):
-    """Configure logging for the application
-    
-    Args:
-        app: Flask application
-    """
-    log_level = getattr(logging, app.config.get('LOG_LEVEL', 'INFO'))
-    
-    # Configure Flask logger
-    app.logger.setLevel(log_level)
-    
-    # Create log directory if it doesn't exist
-    log_dir = 'logs'
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
-    
-    # Add rotating file handler
-    file_handler = RotatingFileHandler(
-        os.path.join(log_dir, 'profile_service.log'),
-        maxBytes=10485760,  # 10MB
-        backupCount=10
-    )
-    file_handler.setLevel(log_level)
-    
-    # Set log format
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
-    
-    # Add handler to logger
-    app.logger.addHandler(file_handler)
